@@ -63,9 +63,11 @@ bignum_t *from_str_to_bignum (char *str){
         len--;}
     else if (*str=='0' && len==1){
         return bignum_zero();}
-    else{
-        sign = pos;}
-
+    else if(*str=='+'){
+        sign = pos;
+        str++;
+        len--;
+        }
     char *new_str = str_without_lead_zero(str, len);
     len = strlen(new_str);
 
@@ -91,12 +93,28 @@ bignum_t *from_str_to_bignum (char *str){
     }
     ap->digits[ch_cnt] = '\0';
     ap->len = ch_cnt;
+    if (!sign){
+        sign=pos;
+    }
     ap->sign = sign; 
 
     free(new_str);
     return ap;
 }
 
+char *str_without_plus(char *str){
+    int j = 0;
+    int len=strlen(str);
+    char *new_str = malloc((len-1)*sizeof(char));
+    if (!new_str){
+        return NULL;
+    }
+    for (int i=1; i<len+1;i++){
+        new_str[j]=str[i];
+        j++;
+    }
+    return new_str;
+}
 
 char *from_bignum_to_str(bignum_t *ap){
     if (!ap){
@@ -124,7 +142,7 @@ char *from_bignum_to_str(bignum_t *ap){
         str[0]='-';
     }
     else if(sign==pos){
-        str[0]='0';
+        str[0]='+';
     }
 
     for (int i=1; i<=len; i++){
@@ -134,5 +152,8 @@ char *from_bignum_to_str(bignum_t *ap){
     str[len+1] = '\0';
     bignum_free(ap);
 
+    if (sign==pos){
+        return str_without_plus(str);
+    }
     return str;
 }

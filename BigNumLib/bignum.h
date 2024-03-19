@@ -27,3 +27,6 @@ void bignum_free(bignum_t *ap);
 
 /* Create a zero */
 bignum_t *bignum_zero ();
+
+/* Remove plus*/
+char *str_without_plus(char *str);
