@@ -25,13 +25,31 @@ void bignum_free(bignum_t *ap){
     }
 }
 
+bignum_t *bignum_zero(){
+    bignum_t *ap = malloc(sizeof(bignum_t));
+    if (!ap){
+        bignum_free(ap);
+        return NULL;
+    }
+    ap->sign = zero;
+    ap->len = 1;
+    ap->digits = malloc(2*sizeof(char)); 
+    if (!ap->digits) {
+        bignum_free(ap);
+        return NULL; 
+    }
+    ap->digits[0] = '0';
+    ap->digits[1] = '\0';
+    return ap;
+
+}
 
 bignum_t *from_str_to_bignum (char *str){
     if (!str || strlen(str)==0){
         return NULL;
     }
 
-    bignum_t *ap = malloc(sizeof(bignum_t));;
+    bignum_t *ap = malloc(sizeof(bignum_t));
     if (!ap){
         return NULL;
     }
@@ -44,16 +62,7 @@ bignum_t *from_str_to_bignum (char *str){
         str++;
         len--;}
     else if (*str=='0' && len==1){
-        ap->sign = zero;
-        ap->len = 1;
-        ap->digits = malloc(2*sizeof(char)); 
-        if (!ap->digits) {
-            bignum_free(ap);
-            return NULL; 
-        }
-        ap->digits[0] = '0';
-        ap->digits[1] = '\0';
-        return ap;}
+        return bignum_zero();}
     else{
         sign = pos;}
 
@@ -61,16 +70,7 @@ bignum_t *from_str_to_bignum (char *str){
     len = strlen(new_str);
 
     if (len==0){
-        ap->sign = zero;
-        ap->len = 1;
-        ap->digits = malloc(sizeof(char)); 
-        if (!ap->digits) {
-            bignum_free(ap);
-            return NULL; 
-        }
-        ap->digits[0] = '0';
-        free(new_str);
-        return ap;}
+        return bignum_zero();}
    
     ap->digits = malloc((len+1) * sizeof(char));
 
@@ -99,19 +99,14 @@ bignum_t *from_str_to_bignum (char *str){
 
 
 char *from_bignum_to_str(bignum_t *ap){
-    if (!ap || !ap->digits){
+    if (!ap){
         bignum_free(ap);
         return NULL;
     }
     int8_t sign = ap->sign;
     unsigned int len = ap->len;
 
-    if (!sign || !len){
-        bignum_free(ap);
-        return NULL;
-    }
-
-    if (sign==0 && len==1){
+    if (sign==zero && len==1){
         char *res = malloc(2*sizeof(char));
         res[0] = '0';
         res[1] = '\0';
@@ -125,10 +120,10 @@ char *from_bignum_to_str(bignum_t *ap){
         return NULL;
     }
 
-    if (sign==-1){
+    if (sign==neg){
         str[0]='-';
     }
-    else if(sign==1){
+    else if(sign==pos){
         str[0]='0';
     }
 

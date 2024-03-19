@@ -24,3 +24,6 @@ char *str_without_lead_zero (char *str, uint8_t len);
 
 /* Free an allocated memory. */
 void bignum_free(bignum_t *ap);
+
+/* Create a zero */
+bignum_t *bignum_zero ();

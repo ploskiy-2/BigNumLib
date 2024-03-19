@@ -48,11 +48,44 @@ MU_TEST(test_str_neg3)
     free(new_str);
 }
 
+MU_TEST(test_str_zero1)
+{
+    char str[] = "0";
+    int8_t sign = zero;
+    bignum_t *ap = from_str_to_bignum(str);
+    char *new_str = from_bignum_to_str(ap);
+
+    mu_check(ap->len == 1);
+    mu_check(ap->sign == sign);
+    mu_assert_string_eq(str, new_str);
+
+    bignum_free(ap);
+    free(new_str);
+}
+/*
+MU_TEST(test_str_zero2)
+{
+    char str[] = "0000";
+    int8_t sign = 0;
+    bignum_t *ap = from_str_to_bignum(str);
+    char *new_str = from_bignum_to_str(ap);
+
+    mu_check(ap->len == 1);
+    mu_check(ap->sign == sign);
+    mu_assert_string_eq(str, new_str);
+
+    bignum_free(ap);
+    free(new_str);
+}*/
+
+
 MU_TEST_SUITE(suite_str)
 {
     MU_RUN_TEST(test_str_neg1);
     MU_RUN_TEST(test_str_neg2);
     MU_RUN_TEST(test_str_neg3);
+    MU_RUN_TEST(test_str_zero1);
+    /*MU_RUN_TEST(test_str_zero2);*/
 }
 
 int main(int argc, char *argv[])
