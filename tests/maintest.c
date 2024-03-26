@@ -161,6 +161,9 @@ MU_TEST(test_sum_pospos1)
     mu_assert_string_eq("246", from_bignum_to_str(sum_left));
     mu_assert_string_eq("246", from_bignum_to_str(sum_right));
 
+    mu_check(is_equal_bignum(actual,sum_left));
+    mu_check(is_equal_bignum(actual,sum_right));
+
 
     bignum_free(a);
     bignum_free(b);
@@ -182,6 +185,8 @@ MU_TEST(test_sum_pospos2)
     mu_assert_string_eq("105", from_bignum_to_str(sum_left));
     mu_assert_string_eq("105", from_bignum_to_str(sum_right));
 
+    mu_check(is_equal_bignum(actual,sum_left));
+    mu_check(is_equal_bignum(actual,sum_right));
 
     bignum_free(a);
     bignum_free(b);
@@ -203,6 +208,8 @@ MU_TEST(test_sum_pospos3)
     mu_assert_string_eq("4342373738288778616697626468600", from_bignum_to_str(sum_left));
     mu_assert_string_eq("4342373738288778616697626468600", from_bignum_to_str(sum_right));
 
+    mu_check(is_equal_bignum(actual,sum_left));
+    mu_check(is_equal_bignum(actual,sum_right));
 
     bignum_free(a);
     bignum_free(b);
@@ -224,6 +231,8 @@ MU_TEST(test_sum_poszer1)
     mu_assert_string_eq("0", from_bignum_to_str(sum_left));
     mu_assert_string_eq("0", from_bignum_to_str(sum_right));
 
+    mu_check(is_equal_bignum(actual,sum_left));
+    mu_check(is_equal_bignum(actual,sum_right));
 
     bignum_free(a);
     bignum_free(b);
@@ -244,7 +253,8 @@ MU_TEST(test_sum_poszer2)
     
     mu_assert_string_eq("132156123", from_bignum_to_str(sum_left));
     mu_assert_string_eq("132156123", from_bignum_to_str(sum_right));
-
+    mu_check(is_equal_bignum(actual,sum_left));
+    mu_check(is_equal_bignum(actual,sum_right));
 
     bignum_free(a);
     bignum_free(b);
@@ -264,7 +274,8 @@ MU_TEST(test_sum_negneg1)
     
     mu_assert_string_eq("-246", from_bignum_to_str(sum_left));
     mu_assert_string_eq("-246", from_bignum_to_str(sum_right));
-
+    mu_check(is_equal_bignum(actual,sum_left));
+    mu_check(is_equal_bignum(actual,sum_right));
 
     bignum_free(a);
     bignum_free(b);
@@ -285,7 +296,8 @@ MU_TEST(test_sum_negneg2)
     
     mu_assert_string_eq("-105", from_bignum_to_str(sum_left));
     mu_assert_string_eq("-105", from_bignum_to_str(sum_right));
-
+    mu_check(is_equal_bignum(actual,sum_left));
+    mu_check(is_equal_bignum(actual,sum_right));
 
     bignum_free(a);
     bignum_free(b);
@@ -306,7 +318,8 @@ MU_TEST(test_sum_negneg3)
     
     mu_assert_string_eq("-4342373738288778616697626468600", from_bignum_to_str(sum_left));
     mu_assert_string_eq("-4342373738288778616697626468600", from_bignum_to_str(sum_right));
-
+    mu_check(is_equal_bignum(actual,sum_left));
+    mu_check(is_equal_bignum(actual,sum_right));
 
     bignum_free(a);
     bignum_free(b);
@@ -326,7 +339,8 @@ MU_TEST(test_sum_negzer1)
     
     mu_assert_string_eq("-132156123", from_bignum_to_str(sum_left));
     mu_assert_string_eq("-132156123", from_bignum_to_str(sum_right));
-
+    mu_check(is_equal_bignum(actual,sum_left));
+    mu_check(is_equal_bignum(actual,sum_right));
 
     bignum_free(a);
     bignum_free(b);

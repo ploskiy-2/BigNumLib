@@ -157,6 +157,9 @@ bignum_t *sum_bignum(bignum_t *ap1, bignum_t *ap2){
     if (((ap1->sign==neg)&&(ap2->sign==neg))||((ap1->sign==neg)||(ap2->sign==neg))&&((ap1->sign==zero)||(ap2->sign==zero)) ){
         sign=neg;
     }
+    if ((ap1->sign==zero)&&(ap2->sign==zero)){
+        sign=zero;
+    }
     unsigned int len1 = ap1->len;
     unsigned int len2 = ap2->len;
     unsigned int len = (len1 > len2) ? len1 : len2;
