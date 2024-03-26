@@ -295,13 +295,16 @@ bignum_t *sub_bignum(bignum_t *ap1, bignum_t *ap2){
         return ap3;
     }
 
-
     /*want to subtract a lower number from a higher*/
     if (compare_bignum(ap1,ap2)==-1){
         bignum_t *r = sub_bignum(ap2,ap1);
-        if(ap1->sign==ap2->sign==pos){
+        if((ap1->sign==ap2->sign==pos) || (ap1->sign==zero && ap2->sign==pos) ){
         r->sign = neg;}
+        else if ((ap1->sign==zero && ap2->sign==neg)){
+            r->sign = pos;
+        }
         return r;
+
     }
     else{
         sign = ap1->sign;
