@@ -138,30 +138,60 @@ char *from_bignum_to_str(bignum_t *ap){
     }
     return str;
 }
+void bignum_add_zero(bignum_t *ap, uint8_t t) {
+    if (!ap) {
+        return;
+    }
+    ap->digits = realloc(ap->digits, sizeof(char) * (ap->len + t));
+    memset(ap->digits + ap->len, 0, t);
 
+    ap->len += t;
+    return;
+}
 bignum_t *sum_bignum(bignum_t *ap1, bignum_t *ap2){
     if(!ap1 || !ap2){
         return NULL;
     }
-    unsigned int len = ap1->len;
+    int8_t sign = pos;
+
+    if (((ap1->sign==neg)&&(ap2->sign==neg))||((ap1->sign==neg)||(ap2->sign==neg))&&((ap1->sign==zero)||(ap2->sign==zero)) ){
+        sign=neg;
+    }
+    unsigned int len1 = ap1->len;
+    unsigned int len2 = ap2->len;
+    unsigned int len = (len1 > len2) ? len1 : len2;
+
+    bignum_add_zero(ap1,len-len1);
+    bignum_add_zero(ap2,len-len2);
+
     bignum_t *ap = malloc(sizeof(bignum_t));
     if (!ap){
-        bignum_free(ap);
         return NULL;
     }
-    
-    ap->digits = malloc((len)*sizeof(char));
+
+    ap->digits = malloc((len+1)*sizeof(char));
     if(!ap->digits){
-        bignum_free(ap);
         return NULL;
     }
+
     int car = 0;
-    int dig = 0;
+    int dig;
+    int digit_sum ;
+
     for (int i=0; i<len; i++){
-        dig = (ap1->digits[i]+ap2->digits[i] + car)%10; 
-        car = dig/10;
+        digit_sum = car;
+        digit_sum  += (ap1->digits[i]) + (ap2->digits[i]);
+        dig = digit_sum%10; 
+        car = digit_sum/10;
+
+        ap->digits[i] = dig;      
     }
-    ap->sign = pos;
+    if (car > 0) { 
+    ap->digits[len] = car; 
+    len++;  
+    }
+    ap->sign = sign;
+    ap->len = len;
     
     return ap;
 }
