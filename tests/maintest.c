@@ -366,11 +366,213 @@ MU_TEST_SUITE(suite_sum)
     MU_RUN_TEST(test_sum_negzer1);
 }
 
+MU_TEST(test_sub_pospos1)
+{
+    bignum_t *a = from_str_to_bignum("465");
+    bignum_t *b = from_str_to_bignum("111");
+    bignum_t *sub = sub_bignum(a, b);
+    bignum_t *actual = from_str_to_bignum("354"); 
+
+    mu_assert_string_eq("354", from_bignum_to_str(sub));
+    mu_check(is_equal_bignum(actual,sub));
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(sub);
+    bignum_free(actual);
+}
+
+MU_TEST(test_sub_poszer)
+{
+    bignum_t *a = from_str_to_bignum("465");
+    bignum_t *b = from_str_to_bignum("0");
+    bignum_t *sub = sub_bignum(a, b);
+    bignum_t *actual = from_str_to_bignum("465"); 
+
+    mu_assert_string_eq("465", from_bignum_to_str(sub));
+    mu_check(is_equal_bignum(actual,sub));
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(sub);
+    bignum_free(actual);
+}
+
+MU_TEST(test_sub_negzer)
+{
+    bignum_t *a = from_str_to_bignum("-465");
+    bignum_t *b = from_str_to_bignum("0");
+    bignum_t *sub = sub_bignum(a, b);
+    bignum_t *actual = from_str_to_bignum("-465"); 
+
+    mu_assert_string_eq("-465", from_bignum_to_str(sub));
+    mu_check(is_equal_bignum(actual,sub));
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(sub);
+    bignum_free(actual);
+}
+
+MU_TEST(test_sub_pospos2)
+{
+    bignum_t *a = from_str_to_bignum("456");
+    bignum_t *b = from_str_to_bignum("450");
+    bignum_t *sub = sub_bignum(a, b);
+
+    bignum_t *actual = from_str_to_bignum("6"); 
+
+    mu_assert_string_eq("6", from_bignum_to_str(sub));
+    mu_check(is_equal_bignum(actual,sub));
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(sub);
+    bignum_free(actual);
+}
+
+MU_TEST(test_sub_1)
+{
+    bignum_t *a = from_str_to_bignum("12354");
+    bignum_t *b = from_str_to_bignum("460");
+
+    bignum_t *sub = sub_bignum(a, b);
+    bignum_t *sub2 = sub_bignum(b,a);
+    
+    bignum_t *actual = from_str_to_bignum("11894"); 
+    bignum_t *actual2 = from_str_to_bignum("-11894"); 
+
+    mu_assert_string_eq("11894", from_bignum_to_str(sub));
+    mu_check(is_equal_bignum(actual,sub));
+
+    mu_assert_string_eq("-11894", from_bignum_to_str(sub2));
+    mu_check(is_equal_bignum(actual2,sub2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(sub2);
+    bignum_free(actual2);
+    bignum_free(sub);
+    bignum_free(actual);
+}
+
+MU_TEST(test_sub_2)
+{
+    bignum_t *a = from_str_to_bignum("1000");
+    bignum_t *b = from_str_to_bignum("1000");
+
+    bignum_t *sub = sub_bignum(a, b);
+    bignum_t *sub2 = sub_bignum(b,a);
+    
+    bignum_t *actual = from_str_to_bignum("0"); 
+    bignum_t *actual2 = from_str_to_bignum("0"); 
+
+    mu_assert_string_eq("0", from_bignum_to_str(sub));
+    mu_check(is_equal_bignum(actual,sub));
+
+    mu_assert_string_eq("0", from_bignum_to_str(sub2));
+    mu_check(is_equal_bignum(actual2,sub2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(sub2);
+    bignum_free(actual2);
+    bignum_free(sub);
+    bignum_free(actual);
+}
+
+MU_TEST(test_sub_3)
+{
+    bignum_t *a = from_str_to_bignum("-125");
+    bignum_t *b = from_str_to_bignum("-13513212315");
+
+    bignum_t *sub = sub_bignum(a, b);
+    bignum_t *sub2 = sub_bignum(b,a);
+    
+    bignum_t *actual = from_str_to_bignum("13513212190"); 
+    bignum_t *actual2 = from_str_to_bignum("-13513212190"); 
+
+    mu_assert_string_eq("13513212190", from_bignum_to_str(sub));
+    mu_check(is_equal_bignum(actual,sub));
+
+    mu_assert_string_eq("-13513212190", from_bignum_to_str(sub2));
+    mu_check(is_equal_bignum(actual2,sub2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(sub2);
+    bignum_free(actual2);
+    bignum_free(sub);
+    bignum_free(actual);
+}
+
+MU_TEST(test_sub_4)
+{
+    bignum_t *a = from_str_to_bignum("-125");
+    bignum_t *b = from_str_to_bignum("456");
+
+    bignum_t *sub = sub_bignum(a, b);
+    bignum_t *sub2 = sub_bignum(b,a);
+    
+    bignum_t *actual = from_str_to_bignum("-581"); 
+    bignum_t *actual2 = from_str_to_bignum("581"); 
+
+    mu_assert_string_eq("-581", from_bignum_to_str(sub));
+    mu_check(is_equal_bignum(actual,sub));
+
+    mu_assert_string_eq("581", from_bignum_to_str(sub2));
+    mu_check(is_equal_bignum(actual2,sub2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(sub2);
+    bignum_free(actual2);
+    bignum_free(sub);
+    bignum_free(actual);
+}
+
+
+MU_TEST(test_sub_5)
+{
+    bignum_t *a = from_str_to_bignum("1");
+    bignum_t *b = from_str_to_bignum("99");
+
+    bignum_t *sub = sub_bignum(a, b);
+    bignum_t *sub2 = sub_bignum(b,a);
+    
+    bignum_t *actual = from_str_to_bignum("-98"); 
+    bignum_t *actual2 = from_str_to_bignum("98"); 
+
+    mu_assert_string_eq("-98", from_bignum_to_str(sub));
+    mu_check(is_equal_bignum(actual,sub));
+
+    mu_assert_string_eq("98", from_bignum_to_str(sub2));
+    mu_check(is_equal_bignum(actual2,sub2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(sub2);
+    bignum_free(actual2);
+    bignum_free(sub);
+    bignum_free(actual);
+}
+
+MU_TEST_SUITE(suite_sub)
+{
+    MU_RUN_TEST(test_sub_pospos1);
+    MU_RUN_TEST(test_sub_poszer);
+    MU_RUN_TEST(test_sub_negzer);
+    MU_RUN_TEST(test_sub_pospos2);
+    MU_RUN_TEST(test_sub_1);
+    MU_RUN_TEST(test_sub_2);
+    MU_RUN_TEST(test_sub_3);
+    MU_RUN_TEST(test_sub_4);
+    MU_RUN_TEST(test_sub_5);
+}
+
+
 int main(int argc, char *argv[])
 {
     
     MU_RUN_SUITE(suite_str);
     MU_RUN_SUITE(suite_sum);
+    MU_RUN_SUITE(suite_sub);
     MU_REPORT();
 
 

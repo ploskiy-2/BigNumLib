@@ -160,6 +160,17 @@ bignum_t *sum_bignum(bignum_t *ap1, bignum_t *ap2){
     if ((ap1->sign==zero)&&(ap2->sign==zero)){
         sign=zero;
     }
+    if ((ap1->sign==neg)&&(ap2->sign==pos)){
+        bignum_t *ap3 = copy_bignum(ap1);
+        ap3->sign = pos;
+        return sub_bignum(ap2,ap3);
+    }
+    if ((ap1->sign==pos)&&(ap2->sign==neg)){
+        bignum_t *ap3 = copy_bignum(ap2);
+        ap3->sign = pos;
+        return sub_bignum(ap1,ap3);
+    }
+
     unsigned int len1 = ap1->len;
     unsigned int len2 = ap2->len;
     unsigned int len = (len1 > len2) ? len1 : len2;
@@ -215,4 +226,150 @@ bool is_equal_bignum(bignum_t *ap1, bignum_t *ap2){
         }
     }
     return true;
+}
+
+int compare_bignum(bignum_t *ap1, bignum_t *ap2) {
+    int res = 0;
+    if ((ap1->len) < (ap2->len)) {
+        res = -1;
+    } 
+    else if ((ap1->len) > (ap2->len)) {
+        res = 1;
+    } 
+    else {
+        for (int i = 0; i < ap1->len; i++) {
+            if ((ap1->digits[ap1->len - 1 - i]) < (ap2->digits[ap2->len - 1 - i])) {
+                res = -1;
+                break;
+            } 
+            else if ((ap1->digits[ap1->len - 1 - i]) > (ap2->digits[ap2->len - 1 - i])) {
+                res = 1;
+                break;
+            }
+        }
+    }
+    return res;
+}
+
+bignum_t *copy_bignum(bignum_t *ap){
+    if (!ap){
+        return NULL;
+    }
+    bignum_t *new_ap = malloc(sizeof(bignum_t));
+    new_ap->sign = ap->sign;
+    new_ap->len = ap->len;
+    new_ap->digits = malloc(ap->len*sizeof(char));
+    if (!new_ap->digits || !ap->digits){
+        return NULL;
+    }
+    for (int i = 0; i < ap->len; i++) {
+        new_ap->digits[i] = ap->digits[i];
+    }
+    return new_ap;
+}
+bignum_t *sub_bignum(bignum_t *ap1, bignum_t *ap2){
+    if(!ap1 || !ap2){
+        return NULL;
+    }
+    int8_t sign;
+
+    /*a - (-b) = a+b */
+    if (ap1->sign==pos && ap2->sign==neg){
+        bignum_t *ap3 = copy_bignum(ap2);
+        ap3->sign = pos;
+        return sum_bignum(ap1,ap3);
+    }
+
+    /*-a - (-b) = -a+b */
+    if (ap1->sign==neg && ap2->sign==neg){
+        bignum_t *r = copy_bignum(ap2);
+        r->sign = pos;
+        return sum_bignum(ap1,r);}
+
+    /*-a - (b)= -(a+b)   */
+    if (ap1->sign==neg && ap2->sign==pos){
+        bignum_t *r = copy_bignum(ap1);
+        r->sign = pos;
+        bignum_t *ap3 = sum_bignum(r,ap2);
+        ap3->sign = neg;
+        return ap3;
+    }
+
+
+    /*want to subtract a lower number from a higher*/
+    if (compare_bignum(ap1,ap2)==-1){
+        bignum_t *r = sub_bignum(ap2,ap1);
+        if(ap1->sign==ap2->sign==pos){
+        r->sign = neg;}
+        return r;
+    }
+    else{
+        sign = ap1->sign;
+    }
+    /*assume |ap1| always more than |ap2| */
+    unsigned int len1 = ap1->len;
+    unsigned int len2 = ap2->len;
+    unsigned int len = len1;
+
+    bignum_add_zero(ap1,len-len1);
+    bignum_add_zero(ap2,len-len2);
+
+    bignum_t *ap = malloc(sizeof(bignum_t));
+    if (!ap){
+        return NULL;
+    }
+
+    ap->digits = malloc((len)*sizeof(char));
+    if(!ap->digits){
+        return NULL;
+    }
+
+    int borrow = 0;
+    int digit_sub ;
+
+    for (int i=0; i<len; i++){
+        digit_sub  = (ap1->digits[i]) - (ap2->digits[i]) - borrow;
+        if (digit_sub<0){
+            digit_sub+=10;
+            borrow = 1;
+        }
+        else{
+            borrow = 0;
+        }
+        ap->digits[i] = digit_sub;      
+    }
+
+    ap->sign = sign;
+    ap->len = len;
+
+
+    remove_leading_zero_from_dig(ap);
+
+    return ap;
+}
+
+void remove_leading_zero_from_dig(bignum_t *ap){
+    char* tmp;
+    size_t old_len, new_len;
+
+    old_len = new_len = ap->len;
+
+    while ((new_len > 1) && (ap->digits[new_len - 1] == 0)) {
+        --new_len;
+    }
+
+    if (new_len != old_len) {
+        tmp = realloc(ap->digits, sizeof(char) * new_len);
+        if (!tmp) {
+        return;
+        }
+        ap->digits = tmp;
+        ap->len = new_len;
+    }
+
+    if ((new_len == 1) && (*ap->digits == 0)) {
+        ap->sign = zero;
+    }
+
+    return;
 }
