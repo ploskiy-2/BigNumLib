@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef enum {
     neg = -1,
@@ -10,7 +11,7 @@ typedef enum {
 
 typedef struct {
     sign_t sign;
-    unsigned int len;
+    int len;
     char *digits;
 } bignum_t;
 
@@ -20,7 +21,7 @@ bignum_t *from_str_to_bignum (char *str);
 char *from_bignum_to_str(bignum_t *ap);
 
 /*Remove leading zeroes*/
-char *str_without_lead_zero (char *str, uint8_t len);
+char *str_without_lead_zero (char *str);
 
 /* Free an allocated memory. */
 void bignum_free(bignum_t *ap);
@@ -30,3 +31,9 @@ bignum_t *bignum_zero ();
 
 /* Remove plus*/
 char *str_without_plus(char *str);
+
+/* Sum of two bignum*/
+bignum_t *sum_bignum(bignum_t *ap1, bignum_t *ap2);
+
+/* Check equality of two bignum*/
+bool is_equal_bignum(bignum_t *ap1, bignum_t *ap2);
