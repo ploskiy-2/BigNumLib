@@ -53,3 +53,6 @@ void remove_leading_zero_from_dig(bignum_t *ap);
 
 /* Mult of two bignum*/
 bignum_t *mult_bignum(bignum_t *ap1, bignum_t *ap2);
+
+/* Div of two bignum*/
+bignum_t *div_bignum(bignum_t *ap1, bignum_t *ap2);

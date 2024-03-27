@@ -679,7 +679,32 @@ MU_TEST_SUITE(suite_mul)
     MU_RUN_TEST(test_mult_negneg);
 
 }
+MU_TEST(test_div_by_zero)
+{
+    bignum_t *a = from_str_to_bignum("-114621646214612465");
+    bignum_t *b = from_str_to_bignum("165165123123153");
+    bignum_t *c = from_str_to_bignum("0");
 
+    bignum_t *div1 = div_bignum(a,c);
+    bignum_t *div2 = div_bignum(b,c);
+    
+    mu_assert_string_eq(NULL, from_bignum_to_str(div1));
+    mu_check(NULL==div1);
+
+    mu_assert_string_eq(NULL, from_bignum_to_str(div2));
+    mu_check(NULL==div2);
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(div1);
+    bignum_free(div2);
+}
+
+MU_TEST_SUITE(suite_div)
+{
+    MU_RUN_TEST(test_div_by_zero);
+}
 int main(int argc, char *argv[])
 {
     
@@ -687,6 +712,7 @@ int main(int argc, char *argv[])
     MU_RUN_SUITE(suite_sum);
     MU_RUN_SUITE(suite_sub);
     MU_RUN_SUITE(suite_mul);
+    MU_RUN_SUITE(suite_div);
     MU_REPORT();
 
 

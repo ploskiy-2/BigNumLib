@@ -416,3 +416,22 @@ bignum_t *mult_bignum(bignum_t *ap1, bignum_t *ap2){
 
     return ap;
 }
+
+bignum_t *div_bignum(bignum_t *ap1, bignum_t *ap2){
+    if (!ap1 || !ap2){
+        return NULL;
+    }
+    /*forbid div by zero*/
+    if (is_equal_bignum(ap2,bignum_zero())){
+        return NULL;
+    }
+
+    bignum_t *ap = malloc(sizeof(bignum_t));
+    if (!ap){
+        return NULL;
+    }
+    ap->sign = ap1->sign * ap2->sign;
+
+    return ;
+
+}
