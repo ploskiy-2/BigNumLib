@@ -432,6 +432,17 @@ bignum_t *div_bignum(bignum_t *ap1, bignum_t *ap2){
     }
     ap->sign = ap1->sign * ap2->sign;
 
-    return ;
+    return bignum_zero();
 
 }
+
+bignum_t *est_q(bignum_t *ap1, bignum_t *ap2){
+    if (!ap1 || !ap2){
+        return NULL;
+    }
+    int res_q = (ap1->digits[ap1->len - 1]*10 + ap1->digits[ap1->len - 2])/ap2->digits[ap2->len - 1];
+    char *s_res_q[2];
+    sprintf(s_res_q, "%d", res_q);
+    return from_str_to_bignum(s_res_q);
+
+ }

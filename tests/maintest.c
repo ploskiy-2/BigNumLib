@@ -701,9 +701,73 @@ MU_TEST(test_div_by_zero)
     bignum_free(div2);
 }
 
+MU_TEST(test_div_pospos1)
+{
+    bignum_t *a = from_str_to_bignum("125");
+    bignum_t *b = from_str_to_bignum("25");
+    bignum_t *c = from_str_to_bignum("-25");
+
+    bignum_t *div1 = div_bignum(a,c);
+    bignum_t *div2 = div_bignum(b,c);
+
+    bignum_t *actual1 = from_str_to_bignum("5");
+    bignum_t *actual2 = from_str_to_bignum("-5");
+    
+    mu_assert_string_eq("5", from_bignum_to_str(div1));
+    mu_check(is_equal_bignum(actual1,div1));
+
+    mu_assert_string_eq("-5", from_bignum_to_str(div2));
+    mu_check(is_equal_bignum(actual2,div2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(div1);
+    bignum_free(div2);
+    bignum_free(actual1);
+    bignum_free(actual2);
+}
+MU_TEST(test_div_est_q1)
+{
+    bignum_t *a = from_str_to_bignum("2356");
+    bignum_t *b = from_str_to_bignum("395");
+    bignum_t *c = from_str_to_bignum("7");
+
+    bignum_t *q = est_q(a,b);
+ 
+    mu_assert_string_eq("7", from_bignum_to_str(q));
+    mu_check(is_equal_bignum(q,c));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(q);
+}
+MU_TEST(test_div_est_q2)
+{
+    bignum_t *a = from_str_to_bignum("9446124561246124321");
+    bignum_t *b = from_str_to_bignum("76521765");
+    bignum_t *c = from_str_to_bignum("13");
+
+    bignum_t *q = est_q(a,b);
+ 
+    mu_assert_string_eq("13", from_bignum_to_str(q));
+    mu_check(is_equal_bignum(q,c));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(q);
+}
+
+
+
 MU_TEST_SUITE(suite_div)
 {
     MU_RUN_TEST(test_div_by_zero);
+    /*MU_RUN_TEST(test_div_pospos1);*/
+    MU_RUN_TEST(test_div_est_q1);
+    MU_RUN_TEST(test_div_est_q2);
 }
 int main(int argc, char *argv[])
 {
