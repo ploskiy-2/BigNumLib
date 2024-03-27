@@ -64,7 +64,7 @@ bignum_t *from_str_to_bignum (char *str){
         return NULL;
     }
 
-    ap->digits = malloc(len * sizeof(char));    
+    ap->digits = calloc(len,sizeof(char));    
 
     if (!ap->digits) {
         bignum_free(ap);
@@ -88,7 +88,7 @@ bignum_t *from_str_to_bignum (char *str){
 char *str_without_plus(char *str){
     int j = 0;
     int len=strlen(str);
-    char *new_str = malloc((len-1)*sizeof(char));
+    char *new_str = calloc(len-1,sizeof(char));
     if (!new_str){
         return NULL;
     }
@@ -114,7 +114,7 @@ char *from_bignum_to_str(bignum_t *ap){
         return res;
     }
 
-    char *str = malloc((len+2)*sizeof(char));
+    char *str = calloc(len+2,sizeof(char));
 
     if (!str){
         return NULL;
@@ -183,7 +183,7 @@ bignum_t *sum_bignum(bignum_t *ap1, bignum_t *ap2){
         return NULL;
     }
 
-    ap->digits = malloc((len+1)*sizeof(char));
+    ap->digits = calloc(len+1,sizeof(char));
     if(!ap->digits){
         return NULL;
     }
@@ -258,7 +258,7 @@ bignum_t *copy_bignum(bignum_t *ap){
     bignum_t *new_ap = malloc(sizeof(bignum_t));
     new_ap->sign = ap->sign;
     new_ap->len = ap->len;
-    new_ap->digits = malloc(ap->len*sizeof(char));
+    new_ap->digits = calloc(ap->len,sizeof(char));
     if (!new_ap->digits || !ap->digits){
         return NULL;
     }
@@ -267,6 +267,7 @@ bignum_t *copy_bignum(bignum_t *ap){
     }
     return new_ap;
 }
+
 bignum_t *sub_bignum(bignum_t *ap1, bignum_t *ap2){
     if(!ap1 || !ap2){
         return NULL;
@@ -322,7 +323,7 @@ bignum_t *sub_bignum(bignum_t *ap1, bignum_t *ap2){
         return NULL;
     }
 
-    ap->digits = malloc((len)*sizeof(char));
+    ap->digits = calloc(len,sizeof(char));
     if(!ap->digits){
         return NULL;
     }
