@@ -298,7 +298,7 @@ bignum_t *sub_bignum(bignum_t *ap1, bignum_t *ap2){
     /*want to subtract a lower number from a higher*/
     if (compare_bignum(ap1,ap2)==-1){
         bignum_t *r = sub_bignum(ap2,ap1);
-        if((ap1->sign==ap2->sign==pos) || (ap1->sign==zero && ap2->sign==pos) ){
+        if((ap1->sign==ap2->sign && ap2->sign==pos) || (ap1->sign==zero && ap2->sign==pos) ){
         r->sign = neg;}
         else if ((ap1->sign==zero && ap2->sign==neg)){
             r->sign = pos;
@@ -373,6 +373,45 @@ void remove_leading_zero_from_dig(bignum_t *ap){
     if ((new_len == 1) && (*ap->digits == 0)) {
         ap->sign = zero;
     }
-
     return;
+}
+
+bignum_t *mult_bignum(bignum_t *ap1, bignum_t *ap2){
+    if (!ap1 || !ap2){
+        return NULL;
+    }
+
+    bignum_t *ap = malloc(sizeof(bignum_t));
+    if (!ap){
+        return NULL;
+    }
+
+    ap->sign = ap1->sign * ap2->sign;
+
+    unsigned int len1 = ap1->len;
+    unsigned int len2 = ap2->len;
+
+
+    char *tmp = calloc(len1+len2,sizeof(char));
+    if (!tmp){
+        return NULL;
+    }
+
+    ap->digits = tmp;
+    ap->len = len1+len2;
+    int car;
+    int mul;
+
+    for (int i=0; i<len1; i++){
+        car = 0;
+        for (int j=0; j<len2; j++){
+            mul = ap1->digits[i] * ap2->digits[j] + car + tmp[i+j];
+            tmp[i+j] = mul % 10 ;
+            car = mul / 10;
+        }
+        tmp[i+len2] += car; 
+    }
+    remove_leading_zero_from_dig(ap);
+
+    return ap;
 }

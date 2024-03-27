@@ -567,12 +567,126 @@ MU_TEST_SUITE(suite_sub)
 }
 
 
+MU_TEST(test_mult_by_zero)
+{
+    bignum_t *a = from_str_to_bignum("124562164");
+    bignum_t *b = from_str_to_bignum("0");
+    bignum_t *c = from_str_to_bignum("-124562164");
+
+    bignum_t *mult1 = mult_bignum(a, b);
+    bignum_t *mult2 = mult_bignum(b,c);
+    
+    bignum_t *actual = from_str_to_bignum("0"); 
+
+    mu_assert_string_eq("0", from_bignum_to_str(mult1));
+    mu_check(is_equal_bignum(actual,mult1));
+
+    mu_assert_string_eq("0", from_bignum_to_str(mult2));
+    mu_check(is_equal_bignum(actual,mult2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(mult1);
+    bignum_free(mult2);
+    bignum_free(actual);
+}
+
+MU_TEST(test_mult_pospos)
+{
+    bignum_t *a = from_str_to_bignum("15");
+    bignum_t *b = from_str_to_bignum("5");
+    bignum_t *c = from_str_to_bignum("12");
+
+    bignum_t *mult1 = mult_bignum(a, b);
+    bignum_t *mult2 = mult_bignum(b,c);
+    
+    bignum_t *actual1 = from_str_to_bignum("75"); 
+    bignum_t *actual2 = from_str_to_bignum("60"); 
+
+    mu_assert_string_eq("75", from_bignum_to_str(mult1));
+    mu_check(is_equal_bignum(actual1,mult1));
+
+    mu_assert_string_eq("60", from_bignum_to_str(mult2));
+    mu_check(is_equal_bignum(actual2,mult2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(mult1);
+    bignum_free(mult2);
+    bignum_free(actual1);
+    bignum_free(actual2);
+}
+MU_TEST(test_mult_posneg)
+{
+    bignum_t *a = from_str_to_bignum("1652");
+    bignum_t *b = from_str_to_bignum("-123152");
+    bignum_t *c = from_str_to_bignum("12312");
+
+    bignum_t *mult1 = mult_bignum(a, b);
+    bignum_t *mult2 = mult_bignum(b,c);
+    
+    bignum_t *actual1 = from_str_to_bignum("-203447104"); 
+    bignum_t *actual2 = from_str_to_bignum("-1516247424"); 
+
+    mu_assert_string_eq("-203447104", from_bignum_to_str(mult1));
+    mu_check(is_equal_bignum(actual1,mult1));
+
+    mu_assert_string_eq("-1516247424", from_bignum_to_str(mult2));
+    mu_check(is_equal_bignum(actual2,mult2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(mult1);
+    bignum_free(mult2);
+    bignum_free(actual1);
+    bignum_free(actual2);
+}
+MU_TEST(test_mult_negneg)
+{
+    bignum_t *a = from_str_to_bignum("-114621646214612465");
+    bignum_t *b = from_str_to_bignum("-21424562146524154621");
+    bignum_t *c = from_str_to_bignum("-26142146214651243142134314");
+
+    bignum_t *mult1 = mult_bignum(a, b);
+    bignum_t *mult2 = mult_bignum(b,c);
+    
+    bignum_t *actual1 = from_str_to_bignum("2455718582661869875228766171253950765"); 
+    bignum_t *actual2 = from_str_to_bignum("560084036219316741156080028368422104485764994"); 
+
+    mu_assert_string_eq("2455718582661869875228766171253950765", from_bignum_to_str(mult1));
+    mu_check(is_equal_bignum(actual1,mult1));
+
+    mu_assert_string_eq("560084036219316741156080028368422104485764994", from_bignum_to_str(mult2));
+    mu_check(is_equal_bignum(actual2,mult2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(mult1);
+    bignum_free(mult2);
+    bignum_free(actual1);
+    bignum_free(actual2);
+}
+
+MU_TEST_SUITE(suite_mul)
+{
+    MU_RUN_TEST(test_mult_by_zero);
+    MU_RUN_TEST(test_mult_pospos);
+    MU_RUN_TEST(test_mult_posneg);
+    MU_RUN_TEST(test_mult_negneg);
+
+}
+
 int main(int argc, char *argv[])
 {
     
     MU_RUN_SUITE(suite_str);
     MU_RUN_SUITE(suite_sum);
     MU_RUN_SUITE(suite_sub);
+    MU_RUN_SUITE(suite_mul);
     MU_REPORT();
 
 
