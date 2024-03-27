@@ -775,8 +775,84 @@ MU_TEST(test_div_norm_q1)
     bignum_free(c);
     bignum_free(q);
 }
+MU_TEST(test_div_pospos2)
+{
+    bignum_t *a = from_str_to_bignum("125");
+    bignum_t *b = from_str_to_bignum("25");
+    bignum_t *c = from_str_to_bignum("-25");
 
+    bignum_t *div1 = div_bignum(a,b);
+    bignum_t *div2 = div_bignum(a,c);
 
+    bignum_t *actual1 = from_str_to_bignum("5");
+    bignum_t *actual2 = from_str_to_bignum("-5");
+    
+    mu_assert_string_eq("5", from_bignum_to_str(div1));
+    mu_check(is_equal_bignum(actual1,div1));
+
+    mu_assert_string_eq("-5", from_bignum_to_str(div2));
+    mu_check(is_equal_bignum(actual2,div2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(div1);
+    bignum_free(div2);
+    bignum_free(actual1);
+    bignum_free(actual2);
+}
+MU_TEST(test_div_pospos3)
+{
+    bignum_t *a = from_str_to_bignum("16515612156123162");
+    bignum_t *b = from_str_to_bignum("51612231");
+    bignum_t *c = from_str_to_bignum("-51612231");
+
+    bignum_t *div1 = div_bignum(a,b);
+    bignum_t *div2 = div_bignum(a,c);
+
+    bignum_t *actual1 = from_str_to_bignum("319994153");
+    bignum_t *actual2 = from_str_to_bignum("-319994153");
+    
+    mu_assert_string_eq("319994153", from_bignum_to_str(div1));
+    mu_check(is_equal_bignum(actual1,div1));
+
+    mu_assert_string_eq("-319994153", from_bignum_to_str(div2));
+    mu_check(is_equal_bignum(actual2,div2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(div1);
+    bignum_free(div2);
+    bignum_free(actual1);
+    bignum_free(actual2);
+}
+MU_TEST(test_div_pospos4)
+{
+    bignum_t *a = from_str_to_bignum("10000000000000000000000000000");
+    bignum_t *b = from_str_to_bignum("10");
+    bignum_t *c = from_str_to_bignum("-15");
+
+    bignum_t *div1 = div_bignum(a,b);
+    bignum_t *div2 = div_bignum(a,c);
+
+    bignum_t *actual1 = from_str_to_bignum("1000000000000000000000000000");
+    bignum_t *actual2 = from_str_to_bignum("-666666666666666666666666666");
+    
+    mu_assert_string_eq("1000000000000000000000000000", from_bignum_to_str(div1));
+    mu_check(is_equal_bignum(actual1,div1));
+
+    mu_assert_string_eq("-666666666666666666666666666", from_bignum_to_str(div2));
+    mu_check(is_equal_bignum(actual2,div2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(div1);
+    bignum_free(div2);
+    bignum_free(actual1);
+    bignum_free(actual2);
+}
 MU_TEST_SUITE(suite_div)
 {
     MU_RUN_TEST(test_div_by_zero);
@@ -784,6 +860,9 @@ MU_TEST_SUITE(suite_div)
     MU_RUN_TEST(test_div_est_q1);
     MU_RUN_TEST(test_div_est_q2);
     MU_RUN_TEST(test_div_norm_q1);
+    MU_RUN_TEST(test_div_pospos2);
+    MU_RUN_TEST(test_div_pospos3);
+    MU_RUN_TEST(test_div_pospos4);
 }
 int main(int argc, char *argv[])
 {
