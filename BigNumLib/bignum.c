@@ -425,12 +425,19 @@ bignum_t *div_bignum(bignum_t *ap1, bignum_t *ap2){
     if (is_equal_bignum(ap2,bignum_zero())){
         return NULL;
     }
+    /*if ap2 is a single digit*/
+    if (ap2->len==1 && ap2->digits[0]==1){
+        bignum_t *r = copy_bignum(ap1);
+        r->sign = ap1->sign * ap2->sign;
+        return r;
+    }
 
     bignum_t *ap = malloc(sizeof(bignum_t));
     if (!ap){
         return NULL;
     }
     ap->sign = ap1->sign * ap2->sign;
+
 
     return bignum_zero();
 
