@@ -495,3 +495,13 @@ bignum_t *div_bignum_long(bignum_t *ap1, bignum_t *ap2){
     remove_leading_zero_from_dig(ap);
     return ap;
 }
+
+bignum_t *mod_bignum(bignum_t *ap1, bignum_t *ap2){
+    if (!ap1 || !ap2){
+        return NULL;
+    }
+    bignum_t *q = div_bignum(ap1,ap2);
+    bignum_t *c = mult_bignum(ap2,q);
+    bignum_t *r = sub_bignum(ap1,c);
+    return r;
+}

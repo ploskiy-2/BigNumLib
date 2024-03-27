@@ -864,6 +864,64 @@ MU_TEST_SUITE(suite_div)
     MU_RUN_TEST(test_div_pospos3);
     MU_RUN_TEST(test_div_pospos4);
 }
+MU_TEST(test_mod_pospos)
+{
+    bignum_t *a = from_str_to_bignum("15623");
+    bignum_t *b = from_str_to_bignum("465");
+    bignum_t *c = from_str_to_bignum("12");
+
+    bignum_t *mod1 = mod_bignum(a,b);
+    bignum_t *mod2 = mod_bignum(a,c);
+
+    bignum_t *actual1 = from_str_to_bignum("278");
+    bignum_t *actual2 = from_str_to_bignum("11");
+    
+    mu_assert_string_eq("278", from_bignum_to_str(mod1));
+    mu_check(is_equal_bignum(actual1,mod1));
+
+    mu_assert_string_eq("11", from_bignum_to_str(mod2));
+    mu_check(is_equal_bignum(actual2,mod2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(mod1);
+    bignum_free(mod2);
+    bignum_free(actual1);
+    bignum_free(actual2);
+}
+MU_TEST(test_mod_posneg)
+{
+    bignum_t *a = from_str_to_bignum("15623");
+    bignum_t *b = from_str_to_bignum("-465");
+    bignum_t *c = from_str_to_bignum("-12");
+
+    bignum_t *mod1 = mod_bignum(a,b);
+    bignum_t *mod2 = mod_bignum(a,c);
+
+    bignum_t *actual1 = from_str_to_bignum("278");
+    bignum_t *actual2 = from_str_to_bignum("11");
+    
+    mu_assert_string_eq("278", from_bignum_to_str(mod1));
+    mu_check(is_equal_bignum(actual1,mod1));
+
+    mu_assert_string_eq("11", from_bignum_to_str(mod2));
+    mu_check(is_equal_bignum(actual2,mod2));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(mod1);
+    bignum_free(mod2);
+    bignum_free(actual1);
+    bignum_free(actual2);
+}
+MU_TEST_SUITE(suite_mod)
+{
+    MU_RUN_TEST(test_mod_pospos);
+    MU_RUN_TEST(test_mod_posneg);
+
+}
 int main(int argc, char *argv[])
 {
     
@@ -872,6 +930,7 @@ int main(int argc, char *argv[])
     MU_RUN_SUITE(suite_sub);
     MU_RUN_SUITE(suite_mul);
     MU_RUN_SUITE(suite_div);
+    MU_RUN_SUITE(suite_mod);
     MU_REPORT();
 
 

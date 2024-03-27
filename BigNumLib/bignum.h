@@ -66,3 +66,10 @@ bignum_t *div_bignum(bignum_t *ap1, bignum_t *ap2);
 
  /*Div by single digit*/
  bignum_t *div_bignum_long(bignum_t *ap1, bignum_t *ap2);
+
+ /*Function est_q and norm_q use for Knuth's Algorithm D, but I don't want 
+ to implement it further, and now div_bignum_long provides division in my lib
+ */
+
+ /* MOD for two bignum */
+ bignum_t *mod_bignum(bignum_t *ap1, bignum_t *ap2);
