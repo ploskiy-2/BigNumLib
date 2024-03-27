@@ -63,3 +63,6 @@ bignum_t *div_bignum(bignum_t *ap1, bignum_t *ap2);
  bignum_t *est_q(bignum_t *ap1, bignum_t *ap2);
 
  bignum_t *norm_q(bignum_t *ap1, bignum_t *ap2);
+
+ /*Div by single digit*/
+ bignum_t *div_bignum_by_sin_dig(bignum_t *ap1, bignum_t *ap2);

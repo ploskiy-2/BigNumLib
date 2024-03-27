@@ -425,24 +425,28 @@ bignum_t *div_bignum(bignum_t *ap1, bignum_t *ap2){
     if (is_equal_bignum(ap2,bignum_zero())){
         return NULL;
     }
-    /*if ap2 is a single digit*/
-    if (ap2->len==1 && ap2->digits[0]==1){
-        bignum_t *r = copy_bignum(ap1);
+    /*if |ap1| < |ap2| */
+    if (compare_bignum(ap1,ap2)==-1 || ap1->sign == zero){
+        return bignum_zero();
+    }
+    /*Div by single digit */
+    if (ap2->len == 1){
+        bignum_t *r = div_bignum_by_sin_dig(ap1,ap2);
         r->sign = ap1->sign * ap2->sign;
         return r;
     }
+
 
     bignum_t *ap = malloc(sizeof(bignum_t));
     if (!ap){
         return NULL;
     }
     ap->sign = ap1->sign * ap2->sign;
-
+    char *res;
 
     return bignum_zero();
 
 }
-
 bignum_t *est_q(bignum_t *ap1, bignum_t *ap2){
     if (!ap1 || !ap2){
         return NULL;
@@ -465,4 +469,25 @@ bignum_t *norm_q(bignum_t *ap1, bignum_t *ap2){
     }
     return est_q(ap1,ap2);
 
- }
+}
+bignum_t *div_bignum_by_sin_dig(bignum_t *ap1, bignum_t *ap2){
+    if (!ap1 || !ap2){
+        return NULL;
+    }
+    bignum_t *ap = malloc(sizeof(bignum_t));
+    if (!ap){
+        return NULL;
+    }
+    ap->digits = calloc(ap1->len - ap2->len + 1,sizeof(char));
+    int w, r, c;
+    c = ap2->digits[0];
+    r = 0;
+    for (int i = 0; i < ap1->len; i++) {
+        w = 10 * r + ap1->digits[ap1->len - 1 - i];
+        ap->digits[ap1->len - 1 - i] = w / c;
+        r = w % c;
+    }
+    ap->len = ap1->len;
+    remove_leading_zero_from_dig(ap);
+    return ap;
+}
