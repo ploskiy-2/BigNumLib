@@ -759,7 +759,22 @@ MU_TEST(test_div_est_q2)
     bignum_free(c);
     bignum_free(q);
 }
+MU_TEST(test_div_norm_q1)
+{
+    bignum_t *a = from_str_to_bignum("192");
+    bignum_t *b = from_str_to_bignum("29");
+    bignum_t *c = from_str_to_bignum("7");
 
+    bignum_t *q = norm_q(a,b);
+ 
+    mu_assert_string_eq("7", from_bignum_to_str(q));
+    mu_check(is_equal_bignum(q,c));
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(c);
+    bignum_free(q);
+}
 
 
 MU_TEST_SUITE(suite_div)
@@ -768,6 +783,7 @@ MU_TEST_SUITE(suite_div)
     /*MU_RUN_TEST(test_div_pospos1);*/
     MU_RUN_TEST(test_div_est_q1);
     MU_RUN_TEST(test_div_est_q2);
+    MU_RUN_TEST(test_div_norm_q1);
 }
 int main(int argc, char *argv[])
 {

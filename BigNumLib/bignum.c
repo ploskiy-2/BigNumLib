@@ -444,5 +444,18 @@ bignum_t *est_q(bignum_t *ap1, bignum_t *ap2){
     char *s_res_q[2];
     sprintf(s_res_q, "%d", res_q);
     return from_str_to_bignum(s_res_q);
+ }
+
+bignum_t *norm_q(bignum_t *ap1, bignum_t *ap2){
+    if (!ap1 || !ap2){
+        return NULL;
+    }
+    bignum_t *tw = from_str_to_bignum("2");
+    if (ap2->digits[ap2->len - 1]<5){
+    bignum_t *n = mult_bignum(ap1,tw);
+    bignum_t *v = mult_bignum(ap2,tw);
+    return est_q(n,v);
+    }
+    return est_q(ap1,ap2);
 
  }
