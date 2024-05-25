@@ -7,7 +7,7 @@ typedef enum {
     neg = -1,
     zero = 0,
     pos = 1
-}sign_t;
+} sign_t;
 
 typedef struct {
     sign_t sign;
