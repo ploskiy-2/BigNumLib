@@ -7,7 +7,6 @@
 #include <bignum.h>
 
 static void remove_leading_zero(bignum_t *ap);
-static char *str_without_plus(char *str);
 static void bignum_add_zero(bignum_t *ap, uint8_t t);
 static void bignum_shift(bignum_t *a, uint8_t n);
 
@@ -95,40 +94,30 @@ bignum_t *from_str_to_bignum (char *str)
     return ap;
 }
 
-static char *str_without_plus(char *str){
-    int j = 0;
-    int len = strlen(str);
-    char *new_str = calloc(len-1,sizeof(char));
-    if (!new_str){
-        return NULL;
-    }
-    for (size_t i=1; i<len+1;i++){
-        new_str[j]=str[i];
-        j++;
-    }
-    return new_str;
-}
-
 char *from_bignum_to_str(bignum_t *ap){
-    if (!ap){
+    if (!ap)
+    {
         return NULL;
     }
 
-    int8_t sign = ap->sign;
+    sign_t sign = ap->sign;
     unsigned int len = ap->len;
 
-    if (sign==zero && len==1){
-        char *res = calloc(2,sizeof(char));
+    if (sign==zero && len==1)
+    {
+        char *res = calloc(2, sizeof(char));
+        if (!res)
+        {
+            return NULL;
+        }
         res[0] = '0';
         res[1] = '\0';
         return res;
     }
 
     char *str = calloc(len+2,sizeof(char));
-
     if (!str)
     {
-        bignum_free(ap);
         return NULL;
     }
 
@@ -136,6 +125,7 @@ char *from_bignum_to_str(bignum_t *ap){
     {
         *str = '-';
     }
+    
     else if(sign==pos)
     {
         *str = '+';
@@ -150,7 +140,7 @@ char *from_bignum_to_str(bignum_t *ap){
 
     if (sign==pos)
     {
-        return str_without_plus(str);
+        memmove(str, str + 1, strlen(str));
     }
     return str;
 }
@@ -167,13 +157,15 @@ static void bignum_add_zero(bignum_t *ap, uint8_t t) {
 }
 
 bignum_t *sum_bignum(bignum_t *ap1, bignum_t *ap2){
-    if(!ap1 || !ap2)
+    if (!ap1 || !ap2)
     {
         return NULL;
     }
     sign_t sign = pos;
+    int car = 0;
+    int dig, digit_sum;
 
-    if ( (ap1->sign + ap2->sign == 2*neg) || ((ap1->sign * ap2->sign == zero) && (ap1->sign + ap2->sign == neg))) 
+    if ((ap1->sign + ap2->sign == 2*neg) || ((ap1->sign * ap2->sign == zero) && (ap1->sign + ap2->sign == neg))) 
     {
         sign = neg;
     }
@@ -185,13 +177,17 @@ bignum_t *sum_bignum(bignum_t *ap1, bignum_t *ap2){
     {
         bignum_t *ap3 = copy_bignum(ap1);
         ap3->sign = pos;
-        return sub_bignum(ap2,ap3);
+        bignum_t *ap4 = sub_bignum(ap2,ap3);
+        bignum_free(ap3);
+        return ap4;
     }
     if ((ap1->sign==pos)&&(ap2->sign==neg))
     {
         bignum_t *ap3 = copy_bignum(ap2);
         ap3->sign = pos;
-        return sub_bignum(ap1,ap3);
+        bignum_t *ap4 = sub_bignum(ap1,ap3);
+        bignum_free(ap3);
+        return ap4;
     }
 
     unsigned int len1 = ap1->len;
@@ -202,23 +198,24 @@ bignum_t *sum_bignum(bignum_t *ap1, bignum_t *ap2){
     bignum_add_zero(ap2,len-len2);
 
     bignum_t *ap = malloc(sizeof(*ap));
+    if (!ap)
+    {
+        bignum_free(ap);
+        return NULL;
+    }
     ap->digits = calloc(len+1,sizeof(char));
-    if (!ap || !ap->digits)
+    if (!ap->digits)
     {
         bignum_free(ap);
         return NULL;
     }
 
-
-    int car = 0;
-    int dig, digit_sum;
-
     for (size_t i=0; i<len; i++)
     {
         digit_sum = car;
         digit_sum  += (ap1->digits[i]) + (ap2->digits[i]);
-        dig = digit_sum%10; 
-        car = digit_sum/10;
+        dig = digit_sum % 10; 
+        car = digit_sum / 10;
 
         ap->digits[i] = dig;      
     }
@@ -281,10 +278,15 @@ bignum_t *copy_bignum(bignum_t *ap)
         return NULL;
     }
     bignum_t *new_ap = malloc(sizeof(*new_ap));
+    if (!new_ap)
+    {
+        bignum_free(new_ap);
+        return NULL;
+    }
     new_ap->sign = ap->sign;
     new_ap->len = ap->len;
     new_ap->digits = calloc(ap->len,sizeof(char));
-    if (!new_ap->digits || !ap->digits)
+    if (!new_ap->digits)
     {
         bignum_free(new_ap);
         return NULL;
@@ -297,45 +299,59 @@ bignum_t *copy_bignum(bignum_t *ap)
 }
 
 bignum_t *sub_bignum(bignum_t *ap1, bignum_t *ap2){
-    if(!ap1 || !ap2){
+    if(!ap1 || !ap2)
+    {
         return NULL;
     }
-    int8_t sign;
+    sign_t sign;
 
     /*a - (-b) = a+b */
-    if (ap1->sign==pos && ap2->sign==neg){
+    if (ap1->sign==pos && ap2->sign==neg)
+    {
         bignum_t *ap3 = copy_bignum(ap2);
         ap3->sign = pos;
-        return sum_bignum(ap1,ap3);
+        bignum_t *ap4 = sum_bignum(ap1,ap3);
+        bignum_free(ap3);
+        return ap4;
     }
 
     /*-a - (-b) = -a+b */
-    if (ap1->sign==neg && ap2->sign==neg){
+    if (ap1->sign==neg && ap2->sign==neg)
+    {
         bignum_t *r = copy_bignum(ap2);
         r->sign = pos;
-        return sum_bignum(ap1,r);}
+        bignum_t *ap4 = sum_bignum(ap1,r);
+        bignum_free(r);
+        return ap4;
+    }
 
     /*-a - (b)= -(a+b)   */
-    if (ap1->sign==neg && ap2->sign==pos){
+    if (ap1->sign==neg && ap2->sign==pos)
+    {
         bignum_t *r = copy_bignum(ap1);
         r->sign = pos;
         bignum_t *ap3 = sum_bignum(r,ap2);
         ap3->sign = neg;
+        bignum_free(r);
         return ap3;
     }
 
     /*want to subtract a lower number from a higher*/
-    if (compare_bignum(ap1,ap2)==-1){
+    if (compare_bignum(ap1,ap2)==-1)
+    {
         bignum_t *r = sub_bignum(ap2,ap1);
-        if((ap1->sign==ap2->sign && ap2->sign==pos) || (ap1->sign==zero && ap2->sign==pos) ){
-        r->sign = neg;}
-        else if ((ap1->sign==zero && ap2->sign==neg)){
+        if ((ap1->sign + ap2->sign == 2*pos) || (ap1->sign==zero && ap2->sign==pos))
+        {
+            r->sign = neg;
+        }
+        else if ((ap1->sign==zero && ap2->sign==neg))
+        {
             r->sign = pos;
         }
         return r;
-
     }
-    else{
+    else
+    {
         sign = ap1->sign;
     }
     /*assume |ap1| always more than |ap2| */
@@ -347,8 +363,13 @@ bignum_t *sub_bignum(bignum_t *ap1, bignum_t *ap2){
     bignum_add_zero(ap2,len-len2);
 
     bignum_t *ap = malloc(sizeof(*ap));
+    if (!ap)
+    {
+        bignum_free(ap);
+        return NULL;
+    }
     ap->digits = calloc(len,sizeof(char));
-    if (!ap || !ap->digits)
+    if (!ap->digits)
     {
         bignum_free(ap);
         return NULL;
@@ -373,10 +394,7 @@ bignum_t *sub_bignum(bignum_t *ap1, bignum_t *ap2){
 
     ap->sign = sign;
     ap->len = len;
-
-
     remove_leading_zero(ap);
-
     return ap;
 }
 
