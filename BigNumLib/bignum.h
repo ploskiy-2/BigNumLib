@@ -12,7 +12,7 @@ typedef enum {
 typedef struct {
     sign_t sign;
     int len;
-    char *digits;
+    uint8_t *digits;
 } bignum_t;
 
 /*Convert from string to bignum*/
