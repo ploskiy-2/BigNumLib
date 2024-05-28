@@ -461,6 +461,9 @@ bignum_t* div_bignum(bignum_t* ap1, bignum_t* ap2)
         bignum_t* ap4 = helper_div_bignum(ap1, ap3);
         ap4->sign = ap1->sign * ap2->sign;
         bignum_free(ap3);
+        if (is_equal_bignum(ap1, mult_bignum(ap4, ap2))){
+            return ap4;
+        }
         return sum_bignum(ap4, from_str_to_bignum("1"));
     }
     if (ap2->sign == pos && ap1->sign == neg)

@@ -956,8 +956,8 @@ MU_TEST(test_div_pospos4)
 }
 MU_TEST(test_div_kk1)
 {
-    bignum_t* a = from_str_to_bignum("-10");
-    bignum_t* b = from_str_to_bignum("-4");
+    bignum_t* a = from_str_to_bignum("-3");
+    bignum_t* b = from_str_to_bignum("-1");
 
     bignum_t* div1 = div_bignum(a, b);
     char* d1 = from_bignum_to_str(div1);

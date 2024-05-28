@@ -8,4 +8,4 @@ add_subdirectory(BigNumLib)
 add_executable(bignum tests/maintest.c)
 
 target_compile_options(bignum PRIVATE -Wall -g)
-target_link_libraries(bignum PUBLIC BigNumLib -Wall -g)
+target_link_libraries(bignum BigNumLib -Wall -g)
