@@ -954,6 +954,20 @@ MU_TEST(test_div_pospos4)
     free(d1);
     free(d2);
 }
+MU_TEST(test_div_kk1)
+{
+    bignum_t* a = from_str_to_bignum("-10");
+    bignum_t* b = from_str_to_bignum("-4");
+
+    bignum_t* div1 = div_bignum(a, b);
+    char* d1 = from_bignum_to_str(div1);
+    mu_assert_string_eq("3", d1);
+
+    bignum_free(a);
+    bignum_free(b);
+    bignum_free(div1);
+    free(d1);
+}
 
 MU_TEST_SUITE(suite_div)
 {
@@ -963,6 +977,7 @@ MU_TEST_SUITE(suite_div)
     MU_RUN_TEST(test_div_pospos22);
     MU_RUN_TEST(test_div_pospos3);
     MU_RUN_TEST(test_div_pospos4);
+    MU_RUN_TEST(test_div_kk1);
 }
 
 MU_TEST(test_mod_pospos)

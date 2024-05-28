@@ -454,7 +454,24 @@ bignum_t* div_bignum(bignum_t* ap1, bignum_t* ap2)
     if (compare_bignum(ap1, ap2) == -1 || ap1->sign == zero) {
         return bignum_zero();
     }
-
+    if (ap2->sign + ap1->sign == 2*neg)
+    {
+        bignum_t* ap3 = copy_bignum(ap2);
+        ap3->sign = pos;
+        bignum_t* ap4 = helper_div_bignum(ap1, ap3);
+        ap4->sign = ap1->sign * ap2->sign;
+        bignum_free(ap3);
+        return sum_bignum(ap4, from_str_to_bignum("1"));
+    }
+    if (ap2->sign == pos && ap1->sign == neg)
+    {
+        bignum_t* ap4 = helper_div_bignum(ap1, ap2);
+        ap4->sign = ap1->sign * ap2->sign;
+        if (is_equal_bignum(ap1, mult_bignum(ap4, ap2))){
+            return ap4;
+        }
+        return sub_bignum(ap4, from_str_to_bignum("1"));
+    }
     if (ap2->sign == neg) {
         bignum_t* ap3 = copy_bignum(ap2);
         ap3->sign = pos;
