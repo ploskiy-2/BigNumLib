@@ -10,7 +10,7 @@ static void remove_leading_zero(bignum_t *ap);
 //add zeroes to the top for useful subtraction 
 static void bignum_add_zero(bignum_t *ap, uint8_t t);
 static void bignum_subtract(bignum_t **a, bignum_t *b);
-static void bignum_shl(bignum_t *x);
+static void bignum_shift(bignum_t *x);
 static bignum_t *helper_sub_bignum(bignum_t *ap1, bignum_t *ap2);
 static bignum_t *helper_div_bignum(bignum_t *ap1, bignum_t *ap2);
 static bignum_t *helper_sum_bignum(bignum_t *ap1, bignum_t *ap2);
@@ -274,6 +274,7 @@ static sign_t define_sign_sum(bignum_t *ap1, bignum_t *ap2)
     {
         return zero;
     }
+    return pos;
 }
 
 bignum_t *sum_bignum(bignum_t *ap1, bignum_t *ap2)
@@ -353,26 +354,26 @@ static bignum_t *helper_sum_bignum(bignum_t *ap1, bignum_t *ap2)
     return ap;
 }
 
-
-
-
-
 bignum_t *sub_bignum(bignum_t *ap1, bignum_t *ap2)
 {
     bignum_t *ap3 = copy_bignum(ap2);
-    bignum_t *ap4 = helper_sub_bignum(ap1,ap3);
+    bignum_t *ap4 = copy_bignum(ap1);
+    bignum_t *ap5 = helper_sub_bignum(ap4,ap3);
     bignum_free(ap3);
-    return ap4;   
+    bignum_free(ap4);
+    return ap5;   
 }
 
-bignum_t *helper_sub_bignum(bignum_t *ap1, bignum_t *ap2)
+static bignum_t *helper_sub_bignum(bignum_t *ap1, bignum_t *ap2)
 {
-    if(!ap1 || !ap2)
+    if (!ap1 || !ap2)
     {
         return NULL;
     }
 
     sign_t sign;
+    int borrow = 0;
+    int digit_sub;
 
     /*a - (-b) = a+b */
     if (ap1->sign==pos && ap2->sign==neg)
@@ -385,7 +386,7 @@ bignum_t *helper_sub_bignum(bignum_t *ap1, bignum_t *ap2)
     }
 
     /*-a - (-b) = -a+b */
-    if (ap1->sign==neg && ap2->sign==neg)
+    if (ap1->sign + ap2->sign == 2*neg)
     {
         bignum_t *r = copy_bignum(ap2);
         r->sign = pos;
@@ -394,7 +395,7 @@ bignum_t *helper_sub_bignum(bignum_t *ap1, bignum_t *ap2)
         return ap4;
     }
 
-    /*-a - (b)= -(a+b)   */
+    /*-a - b= -(a+b)   */
     if (ap1->sign==neg && ap2->sign==pos)
     {
         bignum_t *r = copy_bignum(ap1);
@@ -409,11 +410,11 @@ bignum_t *helper_sub_bignum(bignum_t *ap1, bignum_t *ap2)
     if (compare_bignum(ap1,ap2)==-1)
     {
         bignum_t *r = sub_bignum(ap2,ap1);
-        if ((ap1->sign + ap2->sign == 2*pos) || (ap1->sign==zero && ap2->sign==pos))
+        if ((ap1->sign + ap2->sign == 2*pos) || (ap1->sign + ap2->sign == pos))
         {
             r->sign = neg;
         }
-        else if ((ap1->sign==zero && ap2->sign==neg))
+        else if ((ap1->sign + ap2->sign == neg))
         {
             r->sign = pos;
         }
@@ -423,10 +424,11 @@ bignum_t *helper_sub_bignum(bignum_t *ap1, bignum_t *ap2)
     {
         sign = ap1->sign;
     }
+    
     /*assume |ap1| always more than |ap2| */
-    unsigned int len1 = ap1->len;
-    unsigned int len2 = ap2->len;
-    unsigned int len = len1;
+    size_t len1 = ap1->len;
+    size_t len2 = ap2->len;
+    size_t len = len1;
 
     bignum_add_zero(ap1,len-len1);
     bignum_add_zero(ap2,len-len2);
@@ -434,24 +436,22 @@ bignum_t *helper_sub_bignum(bignum_t *ap1, bignum_t *ap2)
     bignum_t *ap = malloc(sizeof(*ap));
     if (!ap)
     {
-        bignum_free(ap);
         return NULL;
     }
-    ap->digits = calloc(len,sizeof(char));
+    
+    ap->digits = calloc(len,sizeof(*ap->digits));
     if (!ap->digits)
     {
         bignum_free(ap);
         return NULL;
     }
-    int borrow = 0;
-    int digit_sub ;
 
     for (size_t i=0; i<len; i++)
     {
         digit_sub  = (ap1->digits[i]) - (ap2->digits[i]) - borrow;
         if (digit_sub<0)
         {
-            digit_sub+=10;
+            digit_sub += 10;
             borrow = 1;
         }
         else
@@ -463,49 +463,71 @@ bignum_t *helper_sub_bignum(bignum_t *ap1, bignum_t *ap2)
 
     ap->sign = sign;
     ap->len = len;
+
     remove_leading_zero(ap);
     return ap;
 }
 
-
-bignum_t *mult_bignum(bignum_t *ap1, bignum_t *ap2){
-    if (!ap1 || !ap2){
+bignum_t *mult_bignum(bignum_t *ap1, bignum_t *ap2)
+{
+    if (!ap1 || !ap2)
+    {
         return NULL;
     }
     int car,mul;
-    unsigned int len1 = ap1->len;
-    unsigned int len2 = ap2->len;
+    size_t len1 = ap1->len;
+    size_t len2 = ap2->len;
     bignum_t *ap = malloc(sizeof(*ap));
-    ap->sign = ap1->sign * ap2->sign;
-    uint8_t *tmp = calloc(len1+len2,sizeof(char));
-    if (!ap || !tmp)
+    if (!ap)
     {
-        free(ap);
-        free(tmp);
+        return NULL;
+    } 
+    ap->sign = ap1->sign * ap2->sign;
+    
+    ap->digits = calloc(len1+len2, sizeof(*ap->digits));
+    if (!ap->digits)
+    {
+        bignum_free(ap);
         return NULL;
     }
 
-    ap->digits = tmp;
     ap->len = len1+len2;
 
-    for (size_t i=0; i<len1; i++)
+    for (size_t i = 0; i<len1; i++)
     {
         car = 0;
-        for (size_t j=0; j<len2; j++)
+        for (size_t j = 0; j<len2; j++)
         {
-            mul = ap1->digits[i] * ap2->digits[j] + car + tmp[i+j];
-            tmp[i+j] = mul % 10 ;
+            mul = ap1->digits[i] * ap2->digits[j] + car + ap->digits[i+j];
+            ap->digits[i+j] = mul % 10 ;
             car = mul / 10;
         }
-        tmp[i+len2] += car; 
+        ap->digits[i+len2] += car; 
     }
     remove_leading_zero(ap);
-
     return ap;
+}
+
+static void bignum_subtract(bignum_t **a, bignum_t *b)
+{
+    bignum_t *prev;
+    prev = *a;
+    *a = sub_bignum(*a, b);
+    bignum_free(prev);
 }
 
 bignum_t *div_bignum(bignum_t *ap1, bignum_t *ap2)
 {
+    if (ap2->sign == zero)
+    {
+        return NULL;
+    }
+    
+    if (compare_bignum(ap1, ap2) == -1 || ap1->sign == zero)
+    {
+        return bignum_zero();
+    }
+    
     if (ap2->sign == neg)
     {
         bignum_t *ap3 = copy_bignum(ap2);
@@ -518,44 +540,22 @@ bignum_t *div_bignum(bignum_t *ap1, bignum_t *ap2)
     return helper_div_bignum(ap1,ap2);
 }
 
-bignum_t *helper_div_bignum(bignum_t *ap1, bignum_t *ap2) {
+
+static bignum_t *helper_div_bignum(bignum_t *ap1, bignum_t *ap2)
+{
     if (!ap1 || !ap2) 
     {
         return NULL;
-    }
-    if (ap2->sign == zero)
-    {
-        return NULL;
-    }
-    if (compare_bignum(ap1, ap2) == -1 || ap1->sign == zero)
-    {
-        return bignum_zero();
-    }
-    bignum_t *quotient = bignum_zero();
+    } 
+    
+    bignum_t *quotient = create_bignum_size(ap1->len);
     if (!quotient) 
     {
         return NULL;
     }
-    quotient->len = ap1->len;
-    free(quotient->digits);
-    quotient->digits = calloc(ap1->len + 1, sizeof(uint8_t));
-    if (!quotient->digits) 
-    {
-        bignum_free(quotient);
-        return NULL;
-    }
-
-    bignum_t *current = bignum_zero();
+    bignum_t *current = create_bignum_size(ap1->len);
     if (!current)
     {
-        bignum_free(quotient);
-        return NULL;
-    }
-    free(current->digits);
-    current->digits = calloc(ap1->len + 1, sizeof(uint8_t));
-    if (!current->digits)
-    {
-        bignum_free(current);
         bignum_free(quotient);
         return NULL;
     }
@@ -564,12 +564,12 @@ bignum_t *helper_div_bignum(bignum_t *ap1, bignum_t *ap2) {
 
     for (size_t i = 0; i < ap1->len; i++)
     {
-        bignum_shl(current);
+        bignum_shift(current);
 
         current->digits[0] = ap1->digits[ap1->len - i - 1];
         current->len++;
-
         remove_leading_zero(current);
+        
         int count = 0;
         while (compare_bignum(current, ap2) >= 0) 
         {
@@ -588,10 +588,14 @@ bignum_t *helper_div_bignum(bignum_t *ap1, bignum_t *ap2) {
 static bignum_t *create_bignum_size (size_t size)
 {
     bignum_t *ap = malloc(sizeof(*ap));
+    if (!ap)
+    {
+        return NULL;
+    }
     ap->sign = pos;
     ap->len = size;
-    ap->digits = calloc(size + 1,sizeof(uint8_t)); 
-    if (!ap || !ap->digits)
+    ap->digits = calloc(size + 1, sizeof(*ap->digits)); 
+    if (!ap->digits)
     {
         bignum_free(ap);
         return NULL;
@@ -599,30 +603,22 @@ static bignum_t *create_bignum_size (size_t size)
     return ap;
 }
 
-static void bignum_subtract(bignum_t **a, bignum_t *b)
+static void bignum_shift(bignum_t *ap)
 {
-    bignum_t *old;
-    old = *a;
-    *a = sub_bignum(*a, b);
-    bignum_free(old);
-}
-
-static void bignum_shl(bignum_t *x)
-{
-    if (!x)
+    if (!ap)
+    {
         return ;
-
-    uint8_t *old = x->digits;
-    uint8_t *tmp = calloc(x->len + 2, sizeof(uint8_t));
+    }
+    uint8_t *old = ap->digits;
+    uint8_t *tmp = calloc(ap->len + 2, sizeof(*ap->digits));
     if (!tmp)
+    {
         return ;
-
-    memcpy(tmp + 1, old, x->len);
-    x->digits = tmp;
-    x->len += 1;
-
+    }
+    memcpy(tmp + 1, old, ap->len);
+    ap->digits = tmp;
+    ap->len += 1;
     free(old);
-
     return ;
 }
 
@@ -632,9 +628,9 @@ bignum_t *mod_bignum(bignum_t *ap1, bignum_t *ap2)
     {
         return NULL;
     }
-    bignum_t *q = div_bignum(ap1,ap2);
-    bignum_t *c = mult_bignum(ap2,q);
-    bignum_t *r = sub_bignum(ap1,c);
+    bignum_t *q = div_bignum(ap1, ap2);
+    bignum_t *c = mult_bignum(ap2, q);
+    bignum_t *r = sub_bignum(ap1, c);
     bignum_free(q);
     bignum_free(c);
     return r;
