@@ -416,6 +416,10 @@ bignum_t *helper_sub_bignum(bignum_t *ap1, bignum_t *ap2)
 
 static void remove_leading_zero(bignum_t *ap)
 {
+    if (!ap)
+    {
+        return;
+    }
     size_t old_len = ap->len;
     size_t new_len = old_len;
 
@@ -573,8 +577,8 @@ static void bignum_shl(bignum_t *x)
         return ;
 
     uint8_t *old = x->digits;
-    uint8_t *tmp = calloc(x->len + 1, sizeof(uint8_t));
-    if (tmp == NULL)
+    uint8_t *tmp = calloc(x->len + 2, sizeof(uint8_t));
+    if (!tmp)
         return ;
 
     memcpy(tmp + 1, old, x->len);
